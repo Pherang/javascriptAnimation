@@ -1,23 +1,49 @@
-   function addLink(alink) {
-         
-     
-          
-          var anchorAnimationEvent = document.getElementById(alink.getAttribute('id'));
-          anchorAnimationEvent.addEventListener("animationend", listener, false);
-          
-          // All this function does is listen for the end of the animation for links.
-          // It's kind of a delay function without hard coding a delay amount.
-          function listener(anchorAnimationEvent) {
-            switch(anchorAnimationEvent.type) {
-              case "animationend":
-                console.log("Elapsed time is " + anchorAnimationEvent.elapsedTime);
-                console.log("Link is caught " + alink.getAttribute('id'));
-                break;
-              }
-          }
-     
-   }
-// Connect to the wikipedia api and get an entry.
+    
+function seqAnim(jsonResults, numItems) {
+  var newJson = jsonResults;
+  var z = numItems;
+  if (numItems == 0){
+    return "";
+  } else {
+  var i = 10 - numItems;
+    z--;
+    console.log("Iteration is " + i);
+    var link = document.createElement("a");
+    var wikiTitle = "<h2>" + jsonResults[i]['title'] + "</h2>" 
+
+    // Create the link
+    link.setAttribute("href", 'http://enwp.org/?curid=' + jsonResults[i]['pageid'] ) ;
+    link.setAttribute("target", "_#" ) ;
+    link.setAttribute("id", i)
+    link.setAttribute("class", "moveWiki")
+
+    // The snippet from the page
+    var content = jsonResults[i]['snippet'];
+
+    // Insert the content into the link.
+    link.innerHTML = wikiTitle + content;
+
+    //Add an even to listen for the end of the animation.
+
+    $("#wikiDisplay").append(link);
+    // Add the link to the page in the wikiDisplay div.
+    var anchorAnimationEvent = document.getElementById(link.getAttribute('id'));
+    anchorAnimationEvent.addEventListener("animationend", listener, false);
+
+    // All this function does is listen for the end of the animation for links.
+    // It's kind of a delay function without hard coding a delay amount.
+    function listener(anchorAnimationEvent) {
+      switch(anchorAnimationEvent.type) {
+        case "animationend":
+          console.log("Number is " + i);
+          console.log("Items left is " + z);
+          seqAnim(newJson, z)
+          break;
+      }
+    }
+  }
+}
+    // Connect to the wikipedia api and get an entry.
     $("#searchBtn").on("click", function() {
       var searchString = document.getElementById("searchBox").value;
       
@@ -41,36 +67,16 @@
           Display a list of ten and allow user to get the next ten possibly..
         */
         // Loop through ten results and append to Div id #wikiresults
-        for (i=0; i< 10; i++){
+        /* for (i=0; i< 10; i++){ */
           
-          var br = document.createElement("br");
-          var link = document.createElement("a");
-          var wikiTitle = "<h2>" + wikiResults[i]['title'] + "</h2>" 
-          
-          // Create the link
-          link.setAttribute("href", 'http://enwp.org/?curid=' + wikiResults[i]['pageid'] ) ;
-          link.setAttribute("target", "_#" ) ;
-          link.setAttribute("id", i)
-          link.setAttribute("class", "moveWiki")
-          console.log("The link is " + link.getAttribute('id'));
-          // The snippet from the page
-          var content = wikiResults[i]['snippet'];
-          
-          // Insert the content into the link.
-          link.innerHTML = wikiTitle + content;
-          
-          //Add an even to listen for the end of the animation.
-          
-          addLink(link);
-          // Add the link to the page in the wikiDisplay div.
-      
+          seqAnim(wikiResults, 10)
          
-         
+           
          
       
-        }
+        /* } // for loop end */
     
-      }); 
+      }); /* getJSON end */ 
       
       
       
