@@ -1,0 +1,79 @@
+   function addLink(alink) {
+         
+     
+          
+          var anchorAnimationEvent = document.getElementById(alink.getAttribute('id'));
+          anchorAnimationEvent.addEventListener("animationend", listener, false);
+          
+          // All this function does is listen for the end of the animation for links.
+          // It's kind of a delay function without hard coding a delay amount.
+          function listener(anchorAnimationEvent) {
+            switch(anchorAnimationEvent.type) {
+              case "animationend":
+                console.log("Elapsed time is " + anchorAnimationEvent.elapsedTime);
+                console.log("Link is caught " + alink.getAttribute('id'));
+                break;
+              }
+          }
+     
+   }
+// Connect to the wikipedia api and get an entry.
+    $("#searchBtn").on("click", function() {
+      var searchString = document.getElementById("searchBox").value;
+      
+      // Assemble the query
+      var wikiQuery = "https://en.wikipedia.org/w/api.php?action=query&list=search&utf8=&origin=*&format=json&formatversion=2";
+      wikiQuery += "&srsearch=" + searchString;
+      
+      // Normalize the string by making it all lower case.
+      wikiQuery = wikiQuery.toLowerCase();
+      
+      // Send query to wikipedia to get results
+      $.getJSON(wikiQuery, function(json) {
+         
+        var wikiResults = [];
+        wikiResults = json['query']['search'];
+        
+        // Clear the results area of any previous search results
+        $("#wikiDisplay").html("");
+        
+        /* Need to get the title, pageid, and snippet key value pairs
+          Display a list of ten and allow user to get the next ten possibly..
+        */
+        // Loop through ten results and append to Div id #wikiresults
+        for (i=0; i< 10; i++){
+          
+          var br = document.createElement("br");
+          var link = document.createElement("a");
+          var wikiTitle = "<h2>" + wikiResults[i]['title'] + "</h2>" 
+          
+          // Create the link
+          link.setAttribute("href", 'http://enwp.org/?curid=' + wikiResults[i]['pageid'] ) ;
+          link.setAttribute("target", "_#" ) ;
+          link.setAttribute("id", i)
+          link.setAttribute("class", "moveWiki")
+          console.log("The link is " + link.getAttribute('id'));
+          // The snippet from the page
+          var content = wikiResults[i]['snippet'];
+          
+          // Insert the content into the link.
+          link.innerHTML = wikiTitle + content;
+          
+          //Add an even to listen for the end of the animation.
+          
+          addLink(link);
+          // Add the link to the page in the wikiDisplay div.
+      
+         
+         
+         
+      
+        }
+    
+      }); 
+      
+      
+      
+      
+    });
+   // 
